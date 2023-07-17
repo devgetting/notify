@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <title>Notifications | Websocket</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Vista de notificacion</h1>
+        <hr>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <svg class="bd-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#007aff"></rect></svg>
+                    <strong class="me-auto" id="notifyTitle">
+                        <!-- notify title -->
+                    </strong>
+                    <small id="timestamp">11 mins ago</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" id="message">
+                <!-- notify message -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8000/ws/notification/');
+
+        socket.addEventListener('open', () => {
+            console.log('Websocket funcionando');
+        });
+
+        socket.addEventListener('message', (event) => {
+            const { data } = event;
+            const { notify } = JSON.parse(data);
+            const { name, message } = notify;
+
+            const notifyTitle = document.getElementById('notifyTitle');
+            const notifyMessage= document.getElementById('message');
+
+            notifyTitle.textContent = name + ' envió un mensaje'; 
+            notifyMessage.textContent = message;
+
+
+            const notifyToast = document.getElementById('liveToast');
+            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(notifyToast);
+            toastBootstrap.show();
+        });
+
+        socket.addEventListener('close', () => {
+            console.log('socket cerrado');
+        });
+    </script>
+</body>
+</html>

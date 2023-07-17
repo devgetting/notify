@@ -1,0 +1,6 @@
+.vscode
+db.sqlite3
+notify.code-workspace
+migrations
+__pycache__
+venv
